@@ -1,210 +1,140 @@
-﻿using Admin.DAL;
-using Admin.DTO;
+﻿using Admin.DTO;
+using IEliminador.DAL;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T1Skynet.Operaciones
+namespace IEliminadorDAL.DAL
 {
     public partial class Program
     {
-        static EliminadorDAL eliminadoresDAL = new EliminadorDAL();
-        static void IngresarTerminator()
+        static EliminadorDAL eliminadorDAL = new EliminadorDAL();
+
+        static void IngresarEliminador()
         {
-            string num_serie;
-            string tipo;
-            Int32 destino;
+            string numeroDeSerie;
+            string tipoEliminador;
+            int prioridadEjecucion;
             string objetivo;
-            int prioridad;
+            uint fechaDestino;
+
+            Eliminador eliminador = new Eliminador();
 
             do
             {
-                Console.WriteLine("Ingresar N° de Serie :");
-                num_serie = Console.ReadLine().Trim();
-                if (num_serie.Length == 7)
-                {
-                    esValido = true;
-                }
-                else
-                {
-                    Console.WriteLine("Debe tener 7 caracteres");
-                    esValido = false;
-                }
-            } while (!esValido || num_serie.Equals(string.Empty));
+                Console.WriteLine("\nIngrese Número de Serie...");
 
-            //Tipo
+                numeroDeSerie = Console.ReadLine().Trim();
+                eliminador.NumeroDeSerie = numeroDeSerie;
+
+                Console.WriteLine(eliminador.NumeroDeSerie.Equals(string.Empty) ? "ERROR: \nEl número se serie debe tener 7 caracteres" : "Número de serie aceptado. \nGuardando...");
+            } while (eliminador.NumeroDeSerie.Equals(string.Empty));
             do
             {
-                textoTitulo("Ingrese Modelo :");
-                Console.WriteLine(@"a) T-1
-                                    b) T-800
-                                    c) T-1000
-                                    d) T-3000");
-                switch (Console.ReadLine().Trim().ToLower())
-                {
-                    case "a":
-                        tipo = "T-1"; esValido = true;
-                        break;
-                    case "b":
-                        tipo = "T-800"; esValido = true;
-                        break;
-                    case "c":
-                        tipo = "T-1000"; esValido = true;
-                        break;
-                    case "d":
-                        tipo = "T-3000"; esValido = true;
-                        break;
-                    default:
-                        tipo = string.Empty;
-                        Console.WriteLine("Ingresa bien una opción");
-                        esValido = false;
-                        break;
-                }
-            } while (!esValido);
+                Console.WriteLine("\nSeleccione el Tipo de Eliminador...");
+                Console.WriteLine("(a) T-1 \n(b) T-800\n(c) T-1000\n(d) T-3000");
 
-            //Objetivo y prioridad
+                tipoEliminador = Console.ReadLine().Trim();
+                eliminador.TipoEliminador = tipoEliminador;
+
+                Console.WriteLine(eliminador.TipoEliminador.Equals("*") ? "ERROR: \nSeleccione un tipo válido" : "Tipo de Eliminador aceptado. \nGuardando...");
+            } while (eliminador.TipoEliminador.Equals("*"));
             do
             {
-                Console.WriteLine("Ingrese objetivo:");
-                objetivo = Console.ReadLine().Trim().ToLower();
-                switch (objetivo)
-                {
-                    case "Objetivo 1":
-                        prioridad = 1;
-                        break;
-                    case "Objetivo 2":
-                        prioridad = 2;
-                        break;
-                    case "Objetivo 3":
-                        prioridad = 3;
-                        break;
-                    case "Objetivo 4":
-                        prioridad = 4;
-                        break;
-                    case "Objetivo 5":
-                        prioridad = 5;
-                        break;
-                    default:
-                        prioridad = 999;
-                        break;
-                }
-            } while (objetivo.Equals(string.Empty));
+                Console.WriteLine("\nSeleccione prioridad de Ejecución...");
+                Console.WriteLine("1-5 \n999 -> Otro");
 
-            //Destino
+                try { prioridadEjecucion = int.Parse(Console.ReadLine().Trim()); }
+                catch { prioridadEjecucion = 0; }
+
+                eliminador.PrioridadEliminacion = prioridadEjecucion;
+                Console.WriteLine(eliminador.PrioridadEliminacion > 0 && eliminador.PrioridadEliminacion < 6 || eliminador.PrioridadEliminacion == 999 ? "Prioridad aceptada.\nGuardando..." : "ERROR: \nIngrese un valor válido");
+            }
+            while (eliminador.PrioridadEliminacion == 0);
+
             do
             {
-                Console.WriteLine("Ingrese año de destino");
-                esValido = Int32.TryParse(Console.ReadLine().Trim(), out destino);
-                if (destino >= 1997 && destino <= 3000)
-                {
-                    esValido = true;
-                }
-                else
-                {
-                    esValido = false;
-                    rojo("Debe estar entre 1997 y 3000");
-                    Console.WriteLine();
-                }
-            } while (!esValido);
+                Console.WriteLine("\nIngrese el Objetivo...");
 
-            Eliminador terminator = new Eliminador()
+                objetivo = Console.ReadLine().Trim();
+                eliminador.Objetivo = objetivo;
+
+                Console.WriteLine(eliminador.Objetivo.Equals(string.Empty) ? "ERROR: \nIngerse un Objetivo válido." : "Objetivo aceptado. \nGuardando...");
+            } while (eliminador.Objetivo.Equals(string.Empty));
+
+            do
             {
-                Num_serie = num_serie,
-                Tipo = tipo,
-                Destino = destino,
-                Objetivo = objetivo,
-                Prioridad = prioridad
-            };
-            eliminadoresDAL.AgregarEliminador(terminator);
+                Console.WriteLine("\nIngrese Año de destino...\n(1997-3000)");
+
+                try { fechaDestino = uint.Parse(Console.ReadLine().Trim()); }
+                catch { fechaDestino = 0000; }
+
+                eliminador.FechaDestino = fechaDestino;
+
+                Console.WriteLine(eliminador.FechaDestino > 1997 && eliminador.FechaDestino < 3000 ? "Año aceptado\nGuardando..." : "ERROR:\nAño no válido.");
+            } while (eliminador.FechaDestino < 1997 || eliminador.FechaDestino > 3000);
+
+            eliminadorDAL.AgregarEliminador(eliminador);
+            Console.WriteLine("\nValidando datos....\nDatos validados...\nAccediendo a base de datos...\nRegistrando nuevo Eliminador...\nEliminador registrado con Éxito.\n");
         }
-        static void MostrarTerminator()
-        {
-            //Limpiamos y cargamos ascii a la consola
-            Console.Clear();
-            imprimirAscii();
-            rojo("--------------MOSTRAR TERMINATOR--------------");
-            Console.WriteLine();
 
-            //Lista para obtener los terminators y luego mostrar
-            List<Eliminador> eliminadores = eliminadoresDAL.ObtenerEliminadores();
-            for (int i = 0; i < eliminadores.Count(); i++)
-            {
-                Eliminador actual = eliminadores[i];
-                (" Numero de serie:"); Console.Write(actual.Num_serie);
-                (" Tipo[Modelo]:"); Console.Write(actual.Tipo);
-                (" Objetivo:"); Console.Write(actual.Objetivo);
-                (" Destino:"); Console.Write(actual.Destino);
-                Console.WriteLine();
-            }
-            if (eliminadores.Count == 0)
-            {
-                Console.WriteLine("No se han creado Terminators");
-            }
-            Console.ReadLine();
+        static void ListarEliminadores()
+        {
+            Console.WriteLine("\nEliminadores Disponibles");
+            List<Eliminador> eliminadores = eliminadorDAL.ObtenerEliminadores();
+            eliminadores.ForEach(e => Console.WriteLine(e.ToString()));
         }
-        static void BuscarTerminator()
+
+        static void BuscarEliminador()
         {
-            Console.Clear();
-            Console.WriteLine();
-            Console.WriteLine();
-            bool esValido = false;
-            string buscar_tipo;
-            Int32 buscar_destino;
-            List<Eliminador> elim = eliminadoresDAL.ObtenerEliminadores();
-            if (elim.Count == 0)
+            string tipoEliminador;
+            uint fechaDestino;
+            List<Eliminador> eliminadores = new List<Eliminador>();
+
+            Eliminador eliminador = new Eliminador();
+
+            Console.WriteLine("Buscando Eliminador...");
+
+            //Seleccionar sólo los modelos disponibles.
+            do
             {
-               Console.WriteLine ("Aún no hay Terminators creados"); 
-                Console.ReadLine();
-            }
-            else
+                Console.WriteLine("\nSeleccione el Tipo de Eliminador...");
+                Console.WriteLine("(a) T-1 \n(b) T-800\n(c) T-1000\n(d) T-3000");
+
+                tipoEliminador = Console.ReadLine().Trim();
+                eliminador.TipoEliminador = tipoEliminador;
+
+                Console.WriteLine(eliminador.TipoEliminador.Equals("*") ? "ERROR: \nSeleccione un tipo válido" : "Tipo de Eliminador aceptado. \nGuardando...");
+            } while (eliminador.TipoEliminador.Equals("*"));
+
+            //Validar año.
+            do
             {
-                bool reiniciar = false;
-                do
-                {
-                    do
-                    {
-                        Console.Write("Ingresa tipo: ");
-                        buscar_tipo = Console.ReadLine().Trim();
-                    } while (buscar_tipo.Equals(string.Empty));
-                    do
-                    {
-                        Console.Write("Ingresa año destino: ");
-                        esValido = Int32.TryParse(Console.ReadLine().Trim(), out buscar_destino);
-                    } while (!esValido);
-                    List<Eliminador> eliminadores = new EliminadorDAL().FiltrarEliminadores(buscar_tipo, buscar_destino);
-                    if (eliminadores.Count == 0)
-                    {
-                        Console.WriteLine("No hay coincidencias");
-                        ConsoleKeyInfo keyInfo = Console.ReadKey();
-                        if (keyInfo.Key == ConsoleKey.Spacebar)
-                        {
-                            reiniciar = true;
-                        }
-                        else
-                        {
-                            reiniciar = false;
-                        }
-                    }
-                    else
-                    {
-                        Console.Clear();
-                        foreach (Eliminador e in eliminadores)
-                        {
-                            ("Numero de serie:"); Console.Write(e.Num_serie);
-                            ("Tipo[Modelo]:"); Console.Write(e.Tipo);
-                            ("Objetivo:"); Console.Write(e.Objetivo);
-                            Console.WriteLine();
-                            //Console.WriteLine("Numero de serie:{0}, Tipo(Modelo):{1}, Objetivo:{2}", e.Num_serie, e.Tipo, e.Objetivo);
-                        }
-                        reiniciar = false;
-                        Console.ReadLine();
+                Console.WriteLine("\nIngrese Año de destino...\n(1997-3000)");
 
-                    }
-                } while (reiniciar);
+                try { fechaDestino = uint.Parse(Console.ReadLine().Trim()); }
+                catch { fechaDestino = 0000; }
 
-            }
+                eliminador.FechaDestino = fechaDestino;
+
+                Console.WriteLine(eliminador.FechaDestino > 1997 && eliminador.FechaDestino < 3000 ? "Año aceptado\nGuardando..." : "ERROR:\nAño no válido.");
+            } while (eliminador.FechaDestino < 1997 || eliminador.FechaDestino > 3000);
+
+            eliminadores = eliminadorDAL.FiltrarEliminadores(eliminador.TipoEliminador, fechaDestino);
+
+            Console.WriteLine("\nEliminadores Encontrados");
+            eliminadores.ForEach(e => Console.WriteLine(e.ToString()));
+        }
+
+        static void EliminarDB()
+        {
+            Console.WriteLine("Base de datos Eliminada");
+            eliminadorDAL.EliminarDB();
+        }
+    }
 
 
-        
+}
