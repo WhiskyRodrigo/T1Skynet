@@ -1,10 +1,11 @@
 ﻿using System;
+using Admin.DAL;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T1Skynet
+namespace DTO
 {
     public partial class Program
     {
@@ -18,8 +19,8 @@ namespace T1Skynet
             bool continuar = true;
             Console.WriteLine("1. Ingresar Eliminador");
             Console.WriteLine("2. Buscar Eliminador");
-            Console.WriteLine("3. Mostrar Eliminadores");
-            Console.WriteLine("4. Destruir SkyNet\n");
+            Console.WriteLine("3. Mostrar Eliminador");
+            Console.WriteLine("4. Destruir Skynet\n");
 
             switch (Console.ReadLine().Trim())
             {
@@ -36,7 +37,7 @@ namespace T1Skynet
                     EliminarDB();
                     break;
                 default:
-                    Console.WriteLine("Ingrese una opción válida\n");
+                    Console.WriteLine("ERROR#404 OPCION NO VALIDA HUMANO!\n");
                     break;
             }
 
